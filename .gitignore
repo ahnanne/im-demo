@@ -135,6 +135,9 @@ web_modules/
 .cache
 .parcel-cache
 
+# vite cache
+.vite
+
 # Next.js build output
 .next
 out
