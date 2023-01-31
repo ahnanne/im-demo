@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, ServerOptions, BuildOptions } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
@@ -6,7 +6,7 @@ export default defineConfig(({ mode }) => {
   /**
    * Common Server Options
    */
-  const serverOptions = {
+  const serverOptions: ServerOptions = {
     proxy: {
       '/api': {
         target: process.env.VITE_PUBLIC_API_SERVER,
@@ -19,7 +19,7 @@ export default defineConfig(({ mode }) => {
   /**
    * Common Build Options
    */
-  const buildOptions = {
+  const buildOptions: BuildOptions = {
     outDir: 'dist',
     assetsDir: 'assets',
   };
@@ -33,12 +33,12 @@ export default defineConfig(({ mode }) => {
     Object.assign(serverOptions, {
       host: '0.0.0.0',
       port: 3000,
-    });
+    } as ServerOptions);
 
     Object.assign(buildOptions, {
       sourcemap: false,
       manifest: true,
-    });
+    } as BuildOptions);
   }
 
   /**
@@ -48,11 +48,11 @@ export default defineConfig(({ mode }) => {
     Object.assign(serverOptions, {
       host: 'localhost',
       port: 3000,
-    });
+    } as ServerOptions);
 
     Object.assign(buildOptions, {
       sourcemap: true,
-    });
+    } as BuildOptions);
   }
 
   return {
