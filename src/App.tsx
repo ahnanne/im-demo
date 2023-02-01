@@ -1,99 +1,79 @@
-import { useState } from 'react';
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <Wrapper>
-      <div>
-        <LogoLink href="https://vitejs.dev" target="_blank">
-          <Logo src="/vite.svg" alt="Vite logo" />
-        </LogoLink>
-        <LogoLink href="https://reactjs.org" target="_blank">
-          <ReactLogo src="/react.svg" alt="React logo" />
-        </LogoLink>
-      </div>
-      <h1>Varsarr</h1>
-      <div>
-        <a href="https://vitejs.dev/" target="_blank">
-          <p>Vite</p>
-        </a>
-        <a href="https://axios-http.com/" target="_blank">
-          <p>Axios</p>
-        </a>
-        <a href="https://reactjs.org/" target="_blank">
-          <p>React</p>
-        </a>
-        <a href="https://styled-components.com/" target="_blank">
-          <p>Styled-Components</p>
-        </a>
-        <a href="https://github.com/aleclarson/vite-tsconfig-paths" target="_blank">
-          <p>Absolute-Path</p>
-        </a>
-        <a href="https://recoiljs.org/" target="_blank">
-          <p>Recoil</p>
-        </a>
-        <a
-          href="https://tanstack.com/query/v4/?from=reactQueryV3&original=https://react-query-v3.tanstack.com/"
-          target="_blank"
-        >
-          <p>React-Query</p>
-        </a>
-      </div>
-      <Card>
-        <button onClick={() => setCount(count => count + 1)}>count is {count}</button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </Card>
-      <ReadTheDocs>Click on the Vite and React logos to learn more</ReadTheDocs>
-    </Wrapper>
+    <StyledWrapper>
+      <StyledH1>WebRTC demo</StyledH1>
+
+      <StyledH2>Start your webcam</StyledH2>
+      <StyledVideos>
+        <StyledVideo>
+          <StyledH3>Local</StyledH3>
+          <video id="localVideo" autoPlay playsInline></video>
+        </StyledVideo>
+        <StyledVideo>
+          <StyledH3>Remote</StyledH3>
+          <video id="remoteVideo" autoPlay playsInline></video>
+        </StyledVideo>
+      </StyledVideos>
+
+      <button type="button" id="webcamButtom">
+        Start webcam
+      </button>
+      <StyledH2>Create a new call</StyledH2>
+      <button type="button" id="callButton" disabled>
+        Call
+      </button>
+
+      <StyledH2>Join a call</StyledH2>
+      <input id="callInput" />
+      <button id="answerButton" disabled>
+        Answer
+      </button>
+
+      <button id="hangupButton" disabled>
+        Hangup
+      </button>
+    </StyledWrapper>
   );
 }
 
-const logoSpinAnime = keyframes`
-	from { transform: rotate(0deg); }
-	to { transform: rotate(360deg); }
-`;
-
-const Wrapper = styled.div`
+const StyledWrapper = styled.div`
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
 `;
 
-const Logo = styled.img`
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-
-  &:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
+const StyledH1 = styled.h1`
+  color: var(--black);
 `;
 
-const ReactLogo = styled(Logo)`
-  &:hover {
-    filter: drop-shadow(0 0 2em #61dafbaa);
-  }
+const StyledH2 = styled.h1`
+  color: var(--black);
+  font-size: 36px;
 `;
 
-const LogoLink = styled.a`
-  @media (prefers-reduced-motion: no-preference) {
-    &:nth-of-type(2) ${Logo} {
-      animation: ${logoSpinAnime} infinite 20s linear;
-    }
-  }
+const StyledH3 = styled.h1`
+  color: var(--black);
+  font-size: 24px;
 `;
 
-const Card = styled.div`
-  padding: 2em;
+const StyledVideos = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid var(--black);
+  margin-bottom: 20px;
 `;
 
-const ReadTheDocs = styled.p`
-  color: #888;
+const StyledVideo = styled.div`
+  width: 400px;
+  height: 300px;
+  padding: 6px;
 `;
 
 export default App;
