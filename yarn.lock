@@ -568,7 +568,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/app@npm:0.9.1":
+"@firebase/app@npm:0.9.1, @firebase/app@npm:^0.9.1":
   version: 0.9.1
   resolution: "@firebase/app@npm:0.9.1"
   dependencies:
@@ -4665,6 +4665,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "varsarr@workspace:."
   dependencies:
+    "@firebase/app": ^0.9.1
     "@tanstack/react-query": 4.6.0
     "@types/node": 18.7.1
     "@types/react": 18.0.21
