@@ -14,13 +14,13 @@ export const pc = atom<RTCPeerConnection>({
 
 // TODO: 타입 정의
 /** My webcam. */
-export const localStream = atom<any>({
+export const localStream = atom<MediaStream | null>({
   key: 'LocalStream',
   default: null,
 });
 
 /** Peer's webcam. */
-export const remoteStream = atom<any>({
+export const remoteStream = atom<MediaStream | null>({
   key: 'RemoteStream',
   default: null,
 });
