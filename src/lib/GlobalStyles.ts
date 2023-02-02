@@ -16,6 +16,8 @@ const GlobalStyles = createGlobalStyle`
 		-webkit-font-smoothing: antialiased;
 		-moz-osx-font-smoothing: grayscale;
 		-webkit-text-size-adjust: 100%;
+
+		--black: #181818;
 	}
 
 	a {
