@@ -1,11 +1,11 @@
 import { useRef, useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { pc, localStream, remoteStream } from 'store/rtc/atom';
 import { firestore } from 'firebase/config';
 
 function App() {
-  const [peerConnection, setPeerConnection] = useRecoilState(pc);
+  const peerConnection = useRecoilValue(pc);
   const [localStr, setLocalStr] = useRecoilState(localStream);
   const [remoteStr, setRemoteStr] = useRecoilState(remoteStream);
 
@@ -25,15 +25,13 @@ function App() {
       });
 
       // remote stream(상대방 웹캠) 쪽에서 트랙을 가져와서 비디오 스트림에 추가한다.
-      setPeerConnection(curr => ({
-        ...curr,
-        /** Listen to audio/video from the peer connection */
-        ontrack: event => {
-          event.streams[0].getTracks().forEach(track => {
-            remoteStr.addTrack(track);
-          });
-        },
-      }));
+
+      /** Listen to audio/video from the peer connection */
+      peerConnection.ontrack = event => {
+        event.streams[0].getTracks().forEach(track => {
+          remoteStr.addTrack(track);
+        });
+      };
 
       const localVideo = localVideoRef.current;
       const remoteVideo = remoteVideoRef.current;
@@ -52,7 +50,7 @@ function App() {
       setAnswerDisabled(false);
       setWebcamDisabled(true);
     }
-  }, [localStr, remoteStr]);
+  }, [remoteStr]);
 
   // 1. 미디어 소스를 설정한다.
   const handleWebcamButtonClick = async () => {
@@ -68,6 +66,8 @@ function App() {
     }
   };
 
+  console.log(peerConnection);
+
   // 2. offer를 생성한다.
   const handleCallButtonClick = async () => {
     // Firestore 콜렉션 참조
@@ -78,15 +78,10 @@ function App() {
     setCallInput(callDoc.id); // Firestore에 의해 자동으로 생성되는 id
 
     // 발신 후보자들을 받고 DB에 저장한다.
-    setPeerConnection(curr => ({
-      ...curr,
-      // setLocalDescription 전에 이렇게 리스너를 설정해둬야 한다.
-      onicecandidate: event => {
-        event.candidate && offerCandidates.add(event.candidate.toJSON());
-      },
-    }));
-
-    // FIXME: set atom 이후부터는 useEffect 내에서 실행되도록 수정
+    // setLocalDescription 전에 이렇게 리스너를 설정해둬야 한다.
+    peerConnection.onicecandidate = event => {
+      event.candidate && offerCandidates.add(event.candidate.toJSON());
+    };
 
     // offer 생성
     const offerDescription = await peerConnection.createOffer();
@@ -138,12 +133,9 @@ function App() {
       const offerCandidates = callDoc.collection('offerCandidates');
       const answerCandidates = callDoc.collection('answerCandidates');
 
-      setPeerConnection(curr => ({
-        ...curr,
-        onicecandidate: event => {
-          event.candidate && answerCandidates.add(event.candidate.toJSON());
-        },
-      }));
+      peerConnection.onicecandidate = event => {
+        event.candidate && answerCandidates.add(event.candidate.toJSON());
+      };
 
       const callData = (await callDoc.get()).data();
 
