@@ -12,7 +12,6 @@ export const pc = atom<RTCPeerConnection>({
   default: new RTCPeerConnection(rtcConfig),
 });
 
-// TODO: 타입 정의
 /** My webcam. */
 export const localStream = atom<MediaStream | null>({
   key: 'LocalStream',
