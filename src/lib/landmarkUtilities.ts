@@ -137,14 +137,50 @@ export const TRIANGULATION = [
 ];
 
 // * Triangle drawing method
+const drawPath = (ctx: CanvasRenderingContext2D, points: Keypoint[], closePath: boolean) => {
+  // 경로(path) 초기화
+  const region = new Path2D();
 
-// * Draw the points
+  // Path2D.moveTo(x, y): 경로의 시작점 명시
+  const [startPoint] = points;
+  region.moveTo(startPoint.x, startPoint.y);
+
+  points.forEach(({ x, y }) => {
+    // Path2D.lineTo(x, y): 경로의 마지막 점을 (x, y) 좌표에 직선으로 연결합니다.
+    region.lineTo(x, y);
+  });
+
+  if (closePath) {
+    // Path2D.closePath(): 펜의 점이 현재 하위 경로의 시작 부분으로 다시 이동하게 합니다.
+    // 현재 지점에서 출발점까지 직선을 그림으로써 모양을 닫습니다.
+    // 만약 모양이 이미 닫혀 있거나 하나의 점만 있으면 이 메서드는 아무것도 하지 않습니다.
+    region.closePath();
+  }
+
+  // CanvasRenderingContext2D.stroke():
+  // strokes (outlines) the current or given path
+  // with the current stroke style.
+  ctx.strokeStyle = 'pink';
+  ctx.stroke(region);
+};
+
 export const drawMesh = (keypoints: Keypoint[], ctx: CanvasRenderingContext2D) => {
+  // * Draw triangles
+  for (let i = 0; i < TRIANGULATION.length / 3; i++) {
+    // 삼각형의 세 꼭짓점 묶기
+    const indexes = [TRIANGULATION[i * 3], TRIANGULATION[i * 3 + 1], TRIANGULATION[i * 3 + 2]];
+
+    const points = indexes.map(point => keypoints[point]);
+
+    drawPath(ctx, points, true);
+  }
+
+  // * Draw the points
   keypoints.forEach(keypoint => {
     const { x, y } = keypoint;
 
     ctx.beginPath();
-    ctx.arc(x, y, 1, 0, 3 * Math.PI); // TODO: 2 *
+    ctx.arc(x, y, 1, 0, 2 * Math.PI);
     ctx.fillStyle = 'aqua';
     ctx.fill();
   });
