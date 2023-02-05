@@ -33,6 +33,7 @@
     "no-unreachable": "warn",
     "strict": ["error", "global"],
     "curly": "warn",
+    "semi": ["error", "always"],
 
     /* React Options */
     "react/jsx-uses-react": "off",
