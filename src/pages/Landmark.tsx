@@ -82,7 +82,7 @@ const Landmark = () => {
   useEffect(() => {
     if (horizontalRatio >= 0.6) {
       setIrisPosition('left');
-    } else if (horizontalRatio <= 0.35) {
+    } else if (horizontalRatio <= 0.4) {
       setIrisPosition('right');
     } else {
       setIrisPosition('center');
