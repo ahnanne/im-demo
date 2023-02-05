@@ -1,15 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
 import Webcam from 'react-webcam';
+import { toast } from 'react-toastify';
 
 import styled, { css } from 'styled-components';
-import { drawMesh } from 'lib/landmarkUtilities';
+import { drawMesh, checkHorizontalRatio } from 'lib/landmarkUtilities';
 
 const Landmark = () => {
   const webcamRef = useRef<null | Webcam>(null);
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
   const [isWebcamReady, setIsWebcamReady] = useState(false);
+  const [horizontalRatio, setHorizontalRatio] = useState(0.5);
+  const [irisPosition, setIrisPosition] = useState<'left' | 'center' | 'right'>('center');
 
   // Load facemesh
   const loadFacemesh = async () => {
@@ -23,7 +26,7 @@ const Landmark = () => {
 
     window.setInterval(async () => {
       await detect(detector);
-    }, 10);
+    }, 100);
   };
 
   const detect = async (detector: faceLandmarksDetection.FaceLandmarksDetector) => {
@@ -60,6 +63,8 @@ const Landmark = () => {
 
       if (face) {
         drawMesh(face.keypoints, ctx);
+        const ratio = checkHorizontalRatio(face.keypoints);
+        setHorizontalRatio(ratio);
       }
     } catch (e) {
       console.log(e);
@@ -74,15 +79,44 @@ const Landmark = () => {
     }
   }, [isWebcamReady]);
 
+  useEffect(() => {
+    if (horizontalRatio >= 0.6) {
+      setIrisPosition('left');
+    } else if (horizontalRatio <= 0.35) {
+      setIrisPosition('right');
+    } else {
+      setIrisPosition('center');
+    }
+  }, [horizontalRatio]);
+
+  useEffect(() => {
+    if (irisPosition !== 'center') {
+      toast('컨닝하지 마세요', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+    }
+  }, [irisPosition]);
+
   return (
-    <div>
-      <StyledWebcam ref={webcamRef} onCanPlay={() => setIsWebcamReady(true)} />
+    <StyledLayout>
+      <StyledWebcam ref={webcamRef} mirrored={false} onCanPlay={() => setIsWebcamReady(true)} />
       <StyledCanvas ref={canvasRef} />
-    </div>
+    </StyledLayout>
   );
 };
 
 export default Landmark;
+
+const StyledLayout = styled.div`
+  position: relative;
+`;
 
 const commonStyle = css`
   position: absolute;

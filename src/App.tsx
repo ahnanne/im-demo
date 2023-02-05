@@ -1,11 +1,14 @@
-import Landmark from 'pages/Landmark';
-import Rtc from 'pages/Rtc';
 import { Link, Routes, Route } from 'react-router-dom';
+import Rtc from 'pages/Rtc';
+import Landmark from 'pages/Landmark';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.min.css';
 import styled from 'styled-components';
 
 function App() {
   return (
     <StyledWrapper>
+      <ToastContainer />
       <h1>Welcome!</h1>
       <Link to="/rtc">WebRTC Demo</Link>
       <br />
