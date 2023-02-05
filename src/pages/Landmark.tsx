@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
 import Webcam from 'react-webcam';
+import { toast } from 'react-toastify';
 
 import styled, { css } from 'styled-components';
 import { drawMesh, checkHorizontalRatio } from 'lib/landmarkUtilities';
@@ -11,6 +12,7 @@ const Landmark = () => {
 
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [horizontalRatio, setHorizontalRatio] = useState(0.5);
+  const [irisPosition, setIrisPosition] = useState<'left' | 'center' | 'right'>('center');
 
   // Load facemesh
   const loadFacemesh = async () => {
@@ -78,22 +80,43 @@ const Landmark = () => {
   }, [isWebcamReady]);
 
   useEffect(() => {
-    if (horizontalRatio >= 0.65) {
-      console.log('is_left');
+    if (horizontalRatio >= 0.6) {
+      setIrisPosition('left');
     } else if (horizontalRatio <= 0.35) {
-      console.log('is_right');
+      setIrisPosition('right');
+    } else {
+      setIrisPosition('center');
     }
   }, [horizontalRatio]);
 
+  useEffect(() => {
+    if (irisPosition !== 'center') {
+      toast('컨닝하지 마세요', {
+        position: 'top-right',
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+    }
+  }, [irisPosition]);
+
   return (
-    <div>
+    <StyledLayout>
       <StyledWebcam ref={webcamRef} mirrored={false} onCanPlay={() => setIsWebcamReady(true)} />
       <StyledCanvas ref={canvasRef} />
-    </div>
+    </StyledLayout>
   );
 };
 
 export default Landmark;
+
+const StyledLayout = styled.div`
+  position: relative;
+`;
 
 const commonStyle = css`
   position: absolute;
