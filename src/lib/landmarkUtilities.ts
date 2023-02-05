@@ -164,24 +164,38 @@ const drawPath = (ctx: CanvasRenderingContext2D, points: Keypoint[], closePath: 
   ctx.stroke(region);
 };
 
+const drawPoint = (ctx: CanvasRenderingContext2D, x: number, y: number, fillStyle?: string) => {
+  ctx.beginPath();
+  ctx.arc(x, y, 1, 0, 2 * Math.PI);
+  ctx.fillStyle = fillStyle ?? 'aqua';
+  ctx.fill();
+};
+
 export const drawMesh = (keypoints: Keypoint[], ctx: CanvasRenderingContext2D) => {
   // * Draw triangles
-  for (let i = 0; i < TRIANGULATION.length / 3; i++) {
-    // 삼각형의 세 꼭짓점 묶기
-    const indexes = [TRIANGULATION[i * 3], TRIANGULATION[i * 3 + 1], TRIANGULATION[i * 3 + 2]];
+  // for (let i = 0; i < TRIANGULATION.length / 3; i++) {
+  //   // 삼각형의 세 꼭짓점 묶기
+  //   const indexes = [TRIANGULATION[i * 3], TRIANGULATION[i * 3 + 1], TRIANGULATION[i * 3 + 2]];
 
-    const points = indexes.map(point => keypoints[point]);
+  //   const points = indexes.map(point => keypoints[point]);
 
-    drawPath(ctx, points, true);
-  }
+  //   drawPath(ctx, points, true);
+  // }
 
   // * Draw the points
   keypoints.forEach(keypoint => {
+    const { x, y, name } = keypoint;
+
+    if (name === 'leftEye' || name === 'rightEye') {
+      drawPoint(ctx, x, y);
+    }
+  });
+
+  // 홍채 그리기
+  const irisPoints = keypoints.slice(468, 478);
+  irisPoints.forEach(keypoint => {
     const { x, y } = keypoint;
 
-    ctx.beginPath();
-    ctx.arc(x, y, 1, 0, 2 * Math.PI);
-    ctx.fillStyle = 'aqua';
-    ctx.fill();
+    drawPoint(ctx, x, y, 'red');
   });
 };
