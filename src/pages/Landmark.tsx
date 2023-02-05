@@ -1,6 +1,5 @@
-import { LegacyRef, useRef } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import * as facemesh from '@tensorflow-models/face-landmarks-detection';
+import { useState, useRef, useEffect } from 'react';
+import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
 import Webcam from 'react-webcam';
 
 import styled, { css } from 'styled-components';
@@ -9,9 +8,61 @@ const Landmark = () => {
   const webcamRef = useRef<null | Webcam>(null);
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
+  const [isWebcamReady, setIsWebcamReady] = useState(false);
+
+  // Load facemesh
+  const runFacemesh = async () => {
+    try {
+      if (!canvasRef.current) {
+        throw new Error('no canvasRef.current');
+      }
+      if (!webcamRef.current) {
+        throw new Error('no webcamRef.current');
+      }
+      if (!webcamRef.current.video) {
+        throw new Error('no webcamRef.current.video');
+      }
+
+      const { video } = webcamRef.current;
+      const { readyState, videoWidth, videoHeight } = video;
+
+      if (readyState !== 4) {
+        throw new Error('video not ready');
+      }
+
+      video.width = videoWidth;
+      video.height = videoHeight;
+      canvasRef.current.width = videoWidth;
+      canvasRef.current.height = videoHeight;
+
+      const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+      const detectorConfig: faceLandmarksDetection.MediaPipeFaceMeshMediaPipeModelConfig = {
+        runtime: 'mediapipe',
+        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
+        refineLandmarks: true,
+      };
+      const detector = await faceLandmarksDetection.createDetector(model, detectorConfig);
+
+      window.setInterval(async () => {
+        const faces = await detector.estimateFaces(video);
+        console.log(faces);
+      }, 100);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    if (isWebcamReady) {
+      (async () => {
+        await runFacemesh();
+      })();
+    }
+  }, [isWebcamReady]);
+
   return (
     <div>
-      <StyledWebcam ref={webcamRef} />
+      <StyledWebcam ref={webcamRef} onCanPlay={() => setIsWebcamReady(true)} />
       <StyledCanvas ref={canvasRef} />
     </div>
   );

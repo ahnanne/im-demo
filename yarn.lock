@@ -1105,6 +1105,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mediapipe/face_mesh@npm:^0.4.1633559619":
+  version: 0.4.1633559619
+  resolution: "@mediapipe/face_mesh@npm:0.4.1633559619"
+  checksum: e8857d08764bdf3b9c85a87fa9db49220a9603e7289112dc844225b738434c12ba240573768c0fbdd2a034e13758598398c0539c4cb04447ba47c6b0de5c6d5b
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1431,7 +1438,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tensorflow/tfjs-converter@npm:4.2.0":
+"@tensorflow/tfjs-converter@npm:4.2.0, @tensorflow/tfjs-converter@npm:^4.2.0":
   version: 4.2.0
   resolution: "@tensorflow/tfjs-converter@npm:4.2.0"
   peerDependencies:
@@ -1440,7 +1447,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tensorflow/tfjs-core@npm:4.2.0":
+"@tensorflow/tfjs-core@npm:4.2.0, @tensorflow/tfjs-core@npm:^4.2.0":
   version: 4.2.0
   resolution: "@tensorflow/tfjs-core@npm:4.2.0"
   dependencies:
@@ -5112,9 +5119,12 @@ __metadata:
   resolution: "varsarr@workspace:."
   dependencies:
     "@firebase/app": ^0.9.1
+    "@mediapipe/face_mesh": ^0.4.1633559619
     "@tanstack/react-query": 4.6.0
     "@tensorflow-models/face-landmarks-detection": ^1.0.2
     "@tensorflow/tfjs": ^4.2.0
+    "@tensorflow/tfjs-converter": ^4.2.0
+    "@tensorflow/tfjs-core": ^4.2.0
     "@types/node": 18.7.1
     "@types/react": 18.0.21
     "@types/react-dom": 18.0.6
