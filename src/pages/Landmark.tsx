@@ -3,6 +3,7 @@ import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detec
 import Webcam from 'react-webcam';
 
 import styled, { css } from 'styled-components';
+import { drawMesh } from 'lib/landmarkUtilities';
 
 const Landmark = () => {
   const webcamRef = useRef<null | Webcam>(null);
@@ -11,7 +12,21 @@ const Landmark = () => {
   const [isWebcamReady, setIsWebcamReady] = useState(false);
 
   // Load facemesh
-  const runFacemesh = async () => {
+  const loadFacemesh = async () => {
+    const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
+    const detectorConfig: faceLandmarksDetection.MediaPipeFaceMeshMediaPipeModelConfig = {
+      runtime: 'mediapipe',
+      solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
+      refineLandmarks: true,
+    };
+    const detector = await faceLandmarksDetection.createDetector(model, detectorConfig);
+
+    window.setInterval(async () => {
+      await detect(detector);
+    }, 10);
+  };
+
+  const detect = async (detector: faceLandmarksDetection.FaceLandmarksDetector) => {
     try {
       if (!canvasRef.current) {
         throw new Error('no canvasRef.current');
@@ -35,18 +50,17 @@ const Landmark = () => {
       canvasRef.current.width = videoWidth;
       canvasRef.current.height = videoHeight;
 
-      const model = faceLandmarksDetection.SupportedModels.MediaPipeFaceMesh;
-      const detectorConfig: faceLandmarksDetection.MediaPipeFaceMeshMediaPipeModelConfig = {
-        runtime: 'mediapipe',
-        solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
-        refineLandmarks: true,
-      };
-      const detector = await faceLandmarksDetection.createDetector(model, detectorConfig);
+      const ctx = canvasRef.current.getContext('2d');
 
-      window.setInterval(async () => {
-        const faces = await detector.estimateFaces(video);
-        console.log(faces);
-      }, 100);
+      if (!ctx) {
+        throw new Error('ctx not ready');
+      }
+
+      const [face] = await detector.estimateFaces(video);
+
+      if (face) {
+        drawMesh(face.keypoints, ctx);
+      }
     } catch (e) {
       console.log(e);
     }
@@ -55,7 +69,7 @@ const Landmark = () => {
   useEffect(() => {
     if (isWebcamReady) {
       (async () => {
-        await runFacemesh();
+        await loadFacemesh();
       })();
     }
   }, [isWebcamReady]);
