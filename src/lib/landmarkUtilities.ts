@@ -1,4 +1,5 @@
 import { Keypoint } from '@tensorflow-models/face-landmarks-detection';
+import * as POINTS from 'constants/landmark';
 
 // * Triangulation metrics
 // (원소 3개씩 묶여서 하나의 삼각형을 이루게 된다.)
@@ -171,6 +172,11 @@ const drawPoint = (ctx: CanvasRenderingContext2D, x: number, y: number, fillStyl
   ctx.fill();
 };
 
+const drawIndex = (ctx: CanvasRenderingContext2D, x: number, y: number, index: number) => {
+  ctx.font = '12px sans-serif';
+  ctx.fillText(String(index), x, y);
+};
+
 export const drawMesh = (keypoints: Keypoint[], ctx: CanvasRenderingContext2D) => {
   // * Draw triangles
   // for (let i = 0; i < TRIANGULATION.length / 3; i++) {
@@ -183,19 +189,34 @@ export const drawMesh = (keypoints: Keypoint[], ctx: CanvasRenderingContext2D) =
   // }
 
   // * Draw the points
-  keypoints.forEach(keypoint => {
+  keypoints.forEach((keypoint, idx) => {
     const { x, y, name } = keypoint;
 
     if (name === 'leftEye' || name === 'rightEye') {
       drawPoint(ctx, x, y);
+      // drawIndex(ctx, x, y, idx);
     }
   });
 
   // 홍채 그리기
-  const irisPoints = keypoints.slice(468, 478);
-  irisPoints.forEach(keypoint => {
+  const irisPoints = keypoints.slice(POINTS.IRIS_START, POINTS.IRIS_END + 1);
+  irisPoints.forEach((keypoint, idx) => {
     const { x, y } = keypoint;
 
     drawPoint(ctx, x, y, 'red');
+    // drawIndex(ctx, x, y, idx + 468);
   });
+};
+
+export const checkHorizontalRatio = (kp: Keypoint[]) => {
+  const eyeLeftWidth = kp[POINTS.EYE_LEFT_END].x - kp[POINTS.EYE_LEFT_START].x;
+  const eyeRightWidth = kp[POINTS.EYE_RIGHT_END].x - kp[POINTS.EYE_RIGHT_START].x;
+
+  const pupilLeftPos = kp[POINTS.PUPIL_LEFT].x - kp[POINTS.EYE_LEFT_START].x;
+  const pupilRightPos = kp[POINTS.PUPIL_RIGHT].x - kp[POINTS.EYE_RIGHT_START].x;
+
+  const pupilLeft = pupilLeftPos / eyeLeftWidth;
+  const pupilRight = pupilRightPos / eyeRightWidth;
+
+  return Number(((pupilLeft + pupilRight) / 2).toFixed(2));
 };

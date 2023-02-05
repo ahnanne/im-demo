@@ -3,13 +3,14 @@ import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detec
 import Webcam from 'react-webcam';
 
 import styled, { css } from 'styled-components';
-import { drawMesh } from 'lib/landmarkUtilities';
+import { drawMesh, checkHorizontalRatio } from 'lib/landmarkUtilities';
 
 const Landmark = () => {
   const webcamRef = useRef<null | Webcam>(null);
   const canvasRef = useRef<null | HTMLCanvasElement>(null);
 
   const [isWebcamReady, setIsWebcamReady] = useState(false);
+  const [horizontalRatio, setHorizontalRatio] = useState(0.5);
 
   // Load facemesh
   const loadFacemesh = async () => {
@@ -23,7 +24,7 @@ const Landmark = () => {
 
     window.setInterval(async () => {
       await detect(detector);
-    }, 10);
+    }, 100);
   };
 
   const detect = async (detector: faceLandmarksDetection.FaceLandmarksDetector) => {
@@ -60,6 +61,8 @@ const Landmark = () => {
 
       if (face) {
         drawMesh(face.keypoints, ctx);
+        const ratio = checkHorizontalRatio(face.keypoints);
+        setHorizontalRatio(ratio);
       }
     } catch (e) {
       console.log(e);
@@ -74,9 +77,17 @@ const Landmark = () => {
     }
   }, [isWebcamReady]);
 
+  useEffect(() => {
+    if (horizontalRatio >= 0.65) {
+      console.log('is_left');
+    } else if (horizontalRatio <= 0.35) {
+      console.log('is_right');
+    }
+  }, [horizontalRatio]);
+
   return (
     <div>
-      <StyledWebcam ref={webcamRef} onCanPlay={() => setIsWebcamReady(true)} />
+      <StyledWebcam ref={webcamRef} mirrored={false} onCanPlay={() => setIsWebcamReady(true)} />
       <StyledCanvas ref={canvasRef} />
     </div>
   );
