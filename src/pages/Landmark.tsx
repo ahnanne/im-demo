@@ -13,6 +13,7 @@ const Landmark = () => {
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [horizontalRatio, setHorizontalRatio] = useState(0.5);
   const [irisPosition, setIrisPosition] = useState<'left' | 'center' | 'right'>('center');
+  const [detector, setDetector] = useState<null | faceLandmarksDetection.FaceLandmarksDetector>(null);
 
   // Load facemesh
   const loadFacemesh = async () => {
@@ -22,11 +23,8 @@ const Landmark = () => {
       solutionPath: 'https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh',
       refineLandmarks: true,
     };
-    const detector = await faceLandmarksDetection.createDetector(model, detectorConfig);
-
-    window.setInterval(async () => {
-      await detect(detector);
-    }, 100);
+    const d = await faceLandmarksDetection.createDetector(model, detectorConfig);
+    setDetector(d);
   };
 
   const detect = async (detector: faceLandmarksDetection.FaceLandmarksDetector) => {
@@ -78,6 +76,18 @@ const Landmark = () => {
       })();
     }
   }, [isWebcamReady]);
+
+  useEffect(() => {
+    if (detector) {
+      const intervalId = window.setInterval(async () => {
+        await detect(detector);
+      }, 100);
+
+      return (() => {
+        window.clearInterval(intervalId);
+      });
+    }
+  }, [detector]);
 
   useEffect(() => {
     if (horizontalRatio >= 0.6) {
