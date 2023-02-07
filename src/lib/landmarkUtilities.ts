@@ -179,14 +179,14 @@ const drawIndex = (ctx: CanvasRenderingContext2D, x: number, y: number, index: n
 
 export const drawMesh = (keypoints: Keypoint[], ctx: CanvasRenderingContext2D) => {
   // * Draw triangles
-  // for (let i = 0; i < TRIANGULATION.length / 3; i++) {
-  //   // 삼각형의 세 꼭짓점 묶기
-  //   const indexes = [TRIANGULATION[i * 3], TRIANGULATION[i * 3 + 1], TRIANGULATION[i * 3 + 2]];
+  for (let i = 0; i < TRIANGULATION.length / 3; i++) {
+    // 삼각형의 세 꼭짓점 묶기
+    const indexes = [TRIANGULATION[i * 3], TRIANGULATION[i * 3 + 1], TRIANGULATION[i * 3 + 2]];
 
-  //   const points = indexes.map(point => keypoints[point]);
+    const points = indexes.map(point => keypoints[point]);
 
-  //   drawPath(ctx, points, true);
-  // }
+    drawPath(ctx, points, true);
+  }
 
   // * Draw the points
   keypoints.forEach((keypoint, idx) => {

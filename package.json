@@ -4,7 +4,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "HTTPS=true SSL_CRT_FILE=localhost.pem SSL_KEY_FILE=localhost-key.pem vite --open",
+    "dev": "vite --open",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "clean": "npx rimraf dist"
