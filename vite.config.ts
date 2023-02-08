@@ -23,6 +23,9 @@ export default defineConfig(({ mode }) => {
   const buildOptions: BuildOptions = {
     outDir: 'dist',
     assetsDir: 'assets',
+    commonjsOptions: {
+      include: [],
+    },
   };
 
   /**
@@ -58,6 +61,9 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [tsconfigPaths(), react(), mkcert()],
+    optimizeDeps: {
+      disabled: false,
+    },
 
     base: '/',
     publicDir: './public',
