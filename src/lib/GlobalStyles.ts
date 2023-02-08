@@ -18,6 +18,17 @@ const GlobalStyles = createGlobalStyle`
 		-webkit-text-size-adjust: 100%;
 
 		--black: #181818;
+		--theme: #146eb4;
+	}
+
+	.Toastify__toast {
+		border-radius: 10px;
+		line-height: 1.5;
+		color: #585858;
+		font-size: 14px;
+	}
+	.progress-bar {
+		background: linear-gradient(-90deg, var(--theme) 0%, var(--theme) 35%, #fafafa 100%);
 	}
 
 	a {

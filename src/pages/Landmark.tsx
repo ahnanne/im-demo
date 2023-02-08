@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import * as faceLandmarksDetection from '@tensorflow-models/face-landmarks-detection';
 import Webcam from 'react-webcam';
 import { toast } from 'react-toastify';
+import ToggleButton from 'components/common/ToggleButton';
 
 import styled, { css } from 'styled-components';
 import { drawMesh, checkHorizontalRatio } from 'lib/landmarkUtilities';
@@ -13,7 +14,11 @@ const Landmark = () => {
   const [isWebcamReady, setIsWebcamReady] = useState(false);
   const [horizontalRatio, setHorizontalRatio] = useState(0.5);
   const [irisPosition, setIrisPosition] = useState<'left' | 'center' | 'right'>('center');
-  const [detector, setDetector] = useState<null | faceLandmarksDetection.FaceLandmarksDetector>(null);
+  const [detector, setDetector] = useState<null | faceLandmarksDetection.FaceLandmarksDetector>(
+    null,
+  );
+  const [isFeedbackOn, setIsFeedbackOn] = useState(true);
+  const [isDrawingOn, setIsDrawingOn] = useState(false);
 
   // Load facemesh
   const loadFacemesh = async () => {
@@ -60,7 +65,7 @@ const Landmark = () => {
       const [face] = await detector.estimateFaces(video);
 
       if (face) {
-        drawMesh(face.keypoints, ctx);
+        drawMesh(face.keypoints, ctx, isDrawingOn);
         const ratio = checkHorizontalRatio(face.keypoints);
         setHorizontalRatio(ratio);
       }
@@ -83,11 +88,11 @@ const Landmark = () => {
         await detect(detector);
       }, 100);
 
-      return (() => {
+      return () => {
         window.clearInterval(intervalId);
-      });
+      };
     }
-  }, [detector]);
+  }, [detector, isDrawingOn]);
 
   useEffect(() => {
     if (horizontalRatio >= 0.6) {
@@ -100,8 +105,8 @@ const Landmark = () => {
   }, [horizontalRatio]);
 
   useEffect(() => {
-    if (irisPosition !== 'center') {
-      toast('컨닝하지 마세요', {
+    if (isFeedbackOn && irisPosition !== 'center') {
+      toast('화면에 집중하세요.', {
         position: 'top-right',
         autoClose: 2000,
         hideProgressBar: false,
@@ -110,14 +115,38 @@ const Landmark = () => {
         draggable: true,
         progress: undefined,
         theme: 'light',
+        progressClassName: 'progress-bar',
+        type: 'warning',
       });
+    } else if (irisPosition === 'center') {
+      toast.clearWaitingQueue();
     }
-  }, [irisPosition]);
+  }, [irisPosition, isFeedbackOn]);
 
   return (
     <StyledLayout>
-      <StyledWebcam ref={webcamRef} mirrored={false} onCanPlay={() => setIsWebcamReady(true)} />
-      <StyledCanvas ref={canvasRef} />
+      <StyledControlSection>
+        <StyledToggleWrap>
+          <label htmlFor="toggle-feedback">실시간 피드백</label>
+          <ToggleButton
+            id="toggle-feedback"
+            checked={isFeedbackOn}
+            onChange={() => setIsFeedbackOn(!isFeedbackOn)}
+          />
+        </StyledToggleWrap>
+        <StyledToggleWrap>
+          <label htmlFor="draw-mesh">Mesh 표시하기</label>
+          <ToggleButton
+            id="draw-mesh"
+            checked={isDrawingOn}
+            onChange={() => setIsDrawingOn(!isDrawingOn)}
+          />
+        </StyledToggleWrap>
+      </StyledControlSection>
+      <StyledVideoWrap>
+        <StyledWebcam ref={webcamRef} mirrored={false} onCanPlay={() => setIsWebcamReady(true)} />
+        <StyledCanvas ref={canvasRef} />
+      </StyledVideoWrap>
     </StyledLayout>
   );
 };
@@ -126,6 +155,31 @@ export default Landmark;
 
 const StyledLayout = styled.div`
   position: relative;
+  margin-top: 30px;
+`;
+
+const StyledControlSection = styled.div`
+  position: fixed;
+  top: 100px;
+  right: 100px;
+  z-index: 10;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+`;
+
+const StyledToggleWrap = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: space-between;
+  align-items: center;
+  width: 100px;
+  height: 80px;
+
+  & > label {
+    font-size: 14px;
+  }
 `;
 
 const commonStyle = css`
@@ -139,8 +193,18 @@ const commonStyle = css`
   height: 480px;
 `;
 
+const StyledVideoWrap = styled.div`
+  ${commonStyle}
+  border-radius: 14px;
+  box-sizing: content-box;
+  overflow: hidden;
+  padding: 6px;
+  border: 1px solid #d9d9d9;
+`;
+
 const StyledWebcam = styled(Webcam)`
   ${commonStyle}
+  border-radius: 8px;
 `;
 
 const StyledCanvas = styled.canvas`
